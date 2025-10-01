@@ -174,14 +174,17 @@ const Note = require("./models/note");
 const Subject=require("./models/timetable");
 const User = require("./models/user");
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
+const dotenv = require("dotenv");
+
+dotenv.config();
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Connect to your "notes" DB
-mongoose.connect("mongodb://127.0.0.1:27017/notes")
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected to notes DB"))
   .catch(err => console.log(err));
 
