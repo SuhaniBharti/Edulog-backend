@@ -185,6 +185,7 @@ app.use(express.json());
 
 // Connect to your "notes" DB
 mongoose.connect(process.env.MONGO_URI)
+// mongoose.connect("mongodb://127.0.0.1:27017/notes")
   .then(() => console.log("✅ MongoDB connected to notes DB"))
   .catch(err => console.log(err));
 
@@ -250,6 +251,17 @@ app.post("/api/subjects", async (req, res) => {
   const subject = new Subject({ Sname, absent, absentDates, user });
   await subject.save();
   res.status(201).json(subject);
+});
+
+
+app.get("/api/subject/:id", async (req, res) => {
+  try {
+    const subject = await Subject.findById(req.params.id);
+    if (!subject) return res.status(404).json({ message: "Subject not found" });
+    res.json(subject);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 
