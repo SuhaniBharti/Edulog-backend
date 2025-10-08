@@ -233,7 +233,7 @@ app.patch("/api/notes/:id", async (req, res) => {
 });
 
 // Get a single note by ID
-app.get("/api/notes/:id", async (req, res) => {
+app.get("/api/notes/note/:id", async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ message: "Note not found" });
