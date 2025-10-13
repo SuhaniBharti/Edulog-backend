@@ -177,6 +177,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const dotenv = require("dotenv");
+const chatbotRoutes = require("./chatbot");
 
 dotenv.config();
 // Middleware
@@ -197,6 +198,8 @@ mongoose.connect(process.env.MONGO_URI)
 app.get("/", (req, res) => {
   res.send("Notes API Running 🚀");
 });
+
+app.use("/api", chatbotRoutes);
 
 // Get all notes
 app.get("/api/notes/:userId", async (req, res) => {
@@ -240,6 +243,22 @@ app.get("/api/notes/note/:id", async (req, res) => {
     res.json(note);
   } catch (err) {
     res.status(500).json({ message: "Error fetching note" });
+  }
+});
+
+// Mark note as completed or not
+app.patch("/api/notes/:id/complete", async (req, res) => {
+  const { completed } = req.body;
+  try {
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { completed },
+      { new: true }
+    );
+    if (!note) return res.status(404).json({ message: "Note not found" });
+    res.json(note);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating note" });
   }
 });
 
