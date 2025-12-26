@@ -33,8 +33,8 @@ app.use(session(sessionoptions));
 app.use(passport.initialize());
 app.use(passport.session());
 // Connect to your "notes" DB
-// mongoose.connect(process.env.MONGO_URI)
- mongoose.connect("mongodb://127.0.0.1:27017/notes")
+mongoose.connect(process.env.MONGO_URI)
+//  mongoose.connect("mongodb://127.0.0.1:27017/notes")
   .then(() => console.log("✅ MongoDB connected to notes DB"))
   .catch(err => console.log(err));
 
