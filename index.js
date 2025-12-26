@@ -10,21 +10,40 @@ const PORT = process.env.PORT || 5000;
 
 const dotenv = require("dotenv");
 const chatbotRoutes = require("./chatbot");
+const session = require("express-session");
+const passport=require("passport");
+const LocalStrategy=require("passport-local");
+
 
 dotenv.config();
+
+const sessionoptions = {
+  secret: "edulog-secret-key",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
+};
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+app.use(session(sessionoptions));
+app.use(passport.initialize());
+app.use(passport.session());
 // Connect to your "notes" DB
-mongoose.connect(process.env.MONGO_URI)
- //mongoose.connect("mongodb://127.0.0.1:27017/notes")
+// mongoose.connect(process.env.MONGO_URI)
+ mongoose.connect("mongodb://127.0.0.1:27017/notes")
   .then(() => console.log("✅ MongoDB connected to notes DB"))
   .catch(err => console.log(err));
 
   app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 }); 
+
+
+
 // Routes
 
 app.get("/", (req, res) => {
@@ -33,6 +52,10 @@ app.get("/", (req, res) => {
 
 app.use("/api", chatbotRoutes);
 
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 // Get all notes
 app.get("/api/notes/:userId", async (req, res) => {
   const notes = await Note.find({ user: req.params.userId });
@@ -147,36 +170,69 @@ app.delete("/api/subjects/:id", async (req, res) => {
 });
 
 
+// //signup
+// app.post("/api/auth/signup",async(req,res)=>{
+//   try{
+//     const{name,email,password}=req.body;
+//     const existing=await User.findOne({email});
+//     if(existing) return res.status(400).json({message:"Email already exists"});
+
+//     const user=new User({name,email,password});
+//     await user.save();
+//     console.log("Saving user:", req.body);
+
+//     res.json({message:"Signup successful",user});
+//   }catch(err){
+//     res.status(500).json({message:"server error"});
+//   }
+// });
+
+// //login
+// app.post("/api/auth/login",async(req,res)=>{
+//   try{
+//     const {email,password}=req.body;
+//     const user=await User.findOne({email,password});
+//     if(!user) return res.status(400).json({message:"invalid credentials"});
+
+//     res.json({message:"Login successful",user});
+    
+//   }catch(err){
+//     res.status(500).json({message:"Server error"});
+//   }
+// });
+
 //signup
-app.post("/api/auth/signup",async(req,res)=>{
-  try{
-    const{name,email,password}=req.body;
-    const existing=await User.findOne({email});
-    if(existing) return res.status(400).json({message:"Email already exists"});
+app.post("/api/auth/signup", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-    const user=new User({name,email,password});
-    await user.save();
-    console.log("Saving user:", req.body);
+    const user = new User({
+      username: email,   // passport uses this
+      email
+    });
 
-    res.json({message:"Signup successful",user});
-  }catch(err){
-    res.status(500).json({message:"server error"});
+    const registeredUser = await User.register(user, password);
+
+    res.status(201).json({
+      message: "Signup successful",
+      user: registeredUser
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
 //login
-app.post("/api/auth/login",async(req,res)=>{
-  try{
-    const {email,password}=req.body;
-    const user=await User.findOne({email,password});
-    if(!user) return res.status(400).json({message:"invalid credentials"});
-
-    res.json({message:"Login successful",user});
-    
-  }catch(err){
-    res.status(500).json({message:"Server error"});
+app.post(
+  "/api/auth/login",
+  passport.authenticate("local"),
+  (req, res) => {
+    res.json({
+      message: "Login successful",
+      user: req.user
+    });
   }
-});
+);
 
 
 
