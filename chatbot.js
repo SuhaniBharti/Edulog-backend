@@ -20,15 +20,15 @@ const userObjectId = new mongoose.Types.ObjectId(String(userId));
     if (/ongoing/i.test(message)) {
       const ongoing = await Note.find({ user: userObjectId, completed: false });
       reply = ongoing.length
-        ? `📝 You have ${ongoing.length} ongoing task(s):\n${ongoing.map(t => "• " + t.title).join("\n")}`
-        : "✅ You have no ongoing tasks!";
+        ? ` You have ${ongoing.length} ongoing task(s):\n${ongoing.map(t => "• " + t.title).join("\n")}`
+        : " You have no ongoing tasks!";
     }
 
     // Completed tasks
     else if (/completed/i.test(message)) {
       const completed = await Note.find({ user: userObjectId, completed: true });
       reply = completed.length
-        ? `🎯 You’ve completed ${completed.length} task(s):\n${completed.map(t => "• " + t.title).join("\n")}`
+        ? ` You’ve completed ${completed.length} task(s):\n${completed.map(t => "• " + t.title).join("\n")}`
         : "No completed tasks yet — keep going!";
     }
 
@@ -43,19 +43,19 @@ const userObjectId = new mongoose.Types.ObjectId(String(userId));
           Sname: { $regex: new RegExp(`^${subjectName}$`, "i") },
         });
         if (subject) {
-          reply = `📚 You were absent ${subject.absent || 0} day(s) in ${subject.Sname}.`;
+          reply = `You were absent ${subject.absent || 0} day(s) in ${subject.Sname}.`;
         } else {
           reply = `I couldn’t find a subject named "${subjectName}".`;
         }
       } else {
-        reply = "Please specify the subject, e.g. 'absent in Physics'.";
+        reply = "Please specify the subject, e.g 'absent in Physics'.";
       }
     }
 
     // Default fallback
     else {
       reply =
-        "💬 I can help you with:\n" +
+        " I can help you with:\n" +
         "• Your ongoing tasks\n" +
         "• Completed tasks\n" +
         "• Absence details for subjects\n" +
@@ -65,7 +65,7 @@ const userObjectId = new mongoose.Types.ObjectId(String(userId));
     res.json({ reply });
   } catch (err) {
     console.error("Chatbot error:", err);
-    res.status(500).json({ reply: "⚠️ Chatbot encountered an internal error." });
+    res.status(500).json({ reply: "Chatbot encountered an internal error." });
   }
 });
 

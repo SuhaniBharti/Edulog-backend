@@ -1,5 +1,4 @@
-console.log("🔥🔥 THIS INDEX.JS IS RUNNING 🔥🔥");
-
+console.log(" THIS INDEX.JS IS RUNNING ");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -23,29 +22,30 @@ app.use(express.json());
 
 
 app.use((req, res, next) => {
-  console.log("➡️ REQUEST:", req.method, req.url);
+  console.log("REQUEST:", req.method, req.url);
   next();
 });
 
+ 
 
+//mongoose.connect("mongodb://127.0.0.1:27017/notes")
 mongoose.connect(process.env.MONGO_URI)
-  //mongoose.connect("mongodb://127.0.0.1:27017/notes")
   .then(() => {
-    console.log("✅ MongoDB connected to notes DB");
+    console.log("MongoDB connected to notes DB");
 
     app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch(err => {
-    console.error("❌ MongoDB connection failed:", err);
+    console.error(" MongoDB connection failed:", err);
   });
 
 
 // Routes
 
 app.get("/", (req, res) => {
-  res.send("Notes API Running 🚀");
+  res.send("Notes API Running");
 });
 
 app.post("/api/auth/signup", async (req, res) => {
@@ -62,11 +62,11 @@ app.post("/api/auth/signup", async (req, res) => {
     const user = new User({ name, email, password });
     await user.save();
 
-    console.log("✅ User saved:", user);
+    console.log("User saved:", user);
 
     res.status(201).json({ message: "Signup successful", user });
   } catch (err) {
-    console.error("❌ Signup error:", err);   // 🔥 THIS LINE
+    console.error("Signup error:", err);   
     res.status(500).json({ message: err.message });
   }
 });
@@ -85,7 +85,7 @@ app.post("/api/auth/login",async(req,res)=>{
   }catch(err){
     res.status(500).json({message:"Server error"});
   }
-});
+ });
 
 app.use("/api", chatbotRoutes);
 
@@ -102,7 +102,7 @@ app.get("/api/subjects/:userId", async (req, res) => {
 
 // Add new note
 app.post("/api/notes", async (req, res) => {
-  const { title, description, date, userId } = req.body;  // ✅ expect userId
+  const { title, description, date, userId } = req.body;  //  expect userId
   const note = new Note({ title, description, date, user: userId });
   await note.save();
   res.status(201).json(note);
