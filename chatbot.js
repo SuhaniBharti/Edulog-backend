@@ -45,7 +45,7 @@ const userObjectId = new mongoose.Types.ObjectId(String(userId));
         if (subject) {
           reply = `You were absent ${subject.absent || 0} day(s) in ${subject.Sname}.`;
         } else {
-          reply = `I couldn’t find a subject named "${subjectName}".`;
+          reply = `I couldn't find a subject named "${subjectName}".`;
         }
       } else {
         reply = "Please specify the subject, e.g 'absent in Physics'.";
